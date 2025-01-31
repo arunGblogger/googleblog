@@ -1,0 +1,177 @@
+---
+tag:
+  - Docs
+title: "Mastering useEffect: The What, Why, and How"
+description: "Mastering useEffect: The What, Why, and How"
+style:
+  template: split
+  card_template: grid
+  hero_template: image
+  hero_image_opacity: ""
+  container: md
+pubDate: 2024-10-12T20:48:56.054Z
+thumbnail: /src/assets/react-hook-logo.png
+---
+![react-useeffect-banner](/src/assets/react-effect.png)
+
+# Mastering useEffect: The What, Why, and How
+
+When building React applications, managing side effects is crucial. Enter useEffect, one of React’s most powerful and commonly used hooks. Whether you're fetching data, manipulating the DOM, or subscribing to events, useEffect makes it possible. Let's dive deep into its core concepts, practical usage, and nuances.
+
+## **What is useEffect?**
+
+In simple terms, useEffect allows you to perform side effects in functional components. Side effects can include:
+
+- Fetching data from an API
+- Setting up subscriptions (e.g., WebSockets, events)
+- Updating the DOM directly
+- Cleaning up resources when components unmount
+
+Unlike lifecycle methods in class components (like componentDidMount, componentDidUpdate, and componentWillUnmount), useEffect combines them all into one API, making functional components more powerful and declarative.
+
+## **Why useEffect?**
+
+Before React Hooks, handling side effects was tied to class components. useEffect changed the game by:
+
+- Enabling side effects in functional components.
+- Reducing boilerplate code.
+- Allowing fine-grained control over when effects run.
+
+## **How useEffect Works**
+
+useEffect takes two arguments:
+
+```
+useEffect(effect: () => (void | (() => void)), deps?: Array<any>)  
+
+```
+
+1. **Effect Function:** The primary logic for your side effect (e.g., fetching data or subscribing to events).
+1. **Dependency Array:** A list of values that `useEffect` watches. If any value changes, the effect is re-executed.
+
+### **Common Use Cases**
+
+#### **1. Fetching Data**
+
+```
+import React, { useState, useEffect } from "react";
+
+function App() {  
+  const [data, setData] = useState(null);  
+
+  useEffect(() => {  
+    fetch("https://api.example.com/data")  
+      .then((response) => response.json())  
+      .then((data) => setData(data));  
+  }, []); // Empty array ensures the effect runs only once (on mount).  
+
+  return <div>{data ? JSON.stringify(data) : "Loading..."}</div>;  
+}  
+
+```
+
+#### **2. Event Listeners**
+
+```
+useEffect(() => {  
+  const handleResize = () => {  
+    console.log("Window resized");  
+  };  
+
+  window.addEventListener("resize", handleResize);  
+
+  // Cleanup function to remove the listener  
+  return () => {  
+    window.removeEventListener("resize", handleResize);  
+  };  
+}, []);  
+
+```
+
+#### **3. Cleaning Up Subscriptions**
+
+```
+useEffect(() => {  
+  const interval = setInterval(() => {  
+    console.log("Running interval");  
+  }, 1000);  
+
+  // Cleanup on unmount  
+  return () => clearInterval(interval);  
+}, []);  
+
+```
+
+### **Key Concepts**
+
+#### **1. Dependency Array**
+
+The dependency array determines when the effect re-runs:
+
+- **No Dependencies:** The effect runs after every render.
+- **Empty Array (**`**[]**`**)**: The effect runs once after the initial render.
+- **Specific Dependencies:** The effect runs only when the specified values change.
+
+Example:
+
+```
+useEffect(() => {  
+  console.log("Dependency changed!");  
+}, [someValue]);  
+
+```
+
+#### **2. Cleanup Function**
+
+If your effect requires cleanup (e.g., unsubscribing from events), you return a function from the effect:
+
+```
+useEffect(() => {  
+  const timer = setTimeout(() => console.log("Timer!"), 1000);  
+
+  return () => clearTimeout(timer); // Cleanup when the component unmounts.  
+}, []);  
+
+```
+
+![useeffect-mistakes](/src/assets/effect-mistakes.jpg)
+
+### **Common Mistakes to Avoid**
+
+**Missing Dependencies:** Ensure all variables used inside the effect are added to the dependency array. Use tools like eslint-plugin-react-hooks to avoid missing dependencies.
+
+**Unnecessary Re-Renders:** Overly broad dependencies can cause performance issues. Use useCallback or useMemo for stable references.
+
+**Not Cleaning Up:** Always provide a cleanup function if your effect sets up subscriptions or resources.
+
+### **When NOT to Use useEffect**
+
+- Avoid using useEffect for computations that can be derived during render.
+- For local state updates triggered by props, consider using derived state or memoization instead.
+
+### **Best Practices**
+
+- **Group Similar Logic:** Split complex effects into multiple useEffect calls.
+- **Keep Dependencies Minimal:** Add only what's necessary, but don’t omit dependencies for convenience.
+- **Leverage Custom Hooks:** Extract reusable logic into custom hooks for cleaner components.
+
+Example of a custom hook:
+
+```
+function useWindowSize() {  
+  const [size, setSize] = useState(window.innerWidth);  
+
+  useEffect(() => {  
+    const handleResize = () => setSize(window.innerWidth);  
+    window.addEventListener("resize", handleResize);  
+    return () => window.removeEventListener("resize", handleResize);  
+  }, []);  
+
+  return size;  
+}  
+
+```
+
+## **Conclusion**
+
+useEffect is a cornerstone of React's functional component model, simplifying how we manage side effects. By mastering its usage and understanding its nuances, you can build efficient, maintainable, and powerful applications.
